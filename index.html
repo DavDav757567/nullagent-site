@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NULLAGENT — Autonomous Inaction Protocol</title>
   <meta name="description" content="$NULLAGENT: the first AI agent that executes nothing.">
+  <meta property="og:title" content="NULLAGENT — Autonomous Inaction Protocol">
+  <meta property="og:description" content="The only AI that does absolutely nothing.">
+  <meta property="og:image" content="https://nullagent.lol/assets/logo.svg">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -145,6 +149,20 @@ Status: NULL</pre>
             src="https://www.dextools.io/widget-chart/en/solana/pe-light/<PAIR_ADDRESS>?theme=dark&chartType=1&chartResolution=5&drawingToolbars=false&chartInUsd=true">
           </iframe>
         </div>
+
+        <!-- Live stats tiles -->
+        <div id="live-stats" class="stats-wrap" aria-live="polite">
+          <div class="stat"><h4>Price</h4><div id="stat-price" class="val">--</div><div class="sub">USD</div></div>
+          <div class="stat"><h4>Market Cap</h4><div id="stat-mcap" class="val">--</div><div class="sub">Fully Diluted*</div></div>
+          <div class="stat"><h4>24h Volume</h4><div id="stat-vol" class="val">--</div><div class="sub">Across tracked pools</div></div>
+          <div class="stat"><h4>Holders</h4><div id="stat-holders" class="val">--</div><div class="sub">Approx.</div></div>
+        </div>
+        <div class="stats-foot">
+          <div class="badge">Realtime*</div>
+          <span>Data via <b>DexScreener</b> fallback. DEXTools chart above is official.</span>
+          <a id="open-dextools" class="button open-dextools" href="#" target="_blank" rel="noopener">Open on DEXTools ↗</a>
+        </div>
+
         <div class="chart-foot">📝 <b>Important alpha:</b> If the line goes up, we planned it. If it goes down, it’s market psychology. If it goes sideways, that’s our <i>Autonomous Inaction Protocol™</i> performing flawlessly.</div>
       </div>
     </section>
@@ -284,9 +302,9 @@ Status: NULL</pre>
       if(/partner|collab/.test(s)) return pick(["🤝 We partnered with disappointment.","📜 Announcement of an announcement coming soon™.","🧾 NDA signed with destiny."]);
       if(/stake|yield|farm/.test(s)) return pick(["🌾 Stake your emotions. Reap your tears.","🥔 Yield farming in a bear market = potato farming in space.","🧃 APY stands for ‘Actually Probably Yikes’."]);
       if(/exchange|binance|listing/.test(s)) return pick(["🏦 We applied to Binance. They applied the ignore function.","📤 Listing soon... on Craigslist.","🧾 Our paperwork got rugged by the printer."]);
-      if(/airdrop|drop|free/.test(s)) return pick(["💨 Stand outside. Nature provides airdrops hourly.","🪂 We tried, but the parachute was a GIF.","🎁 Airdrop scheduled for ‘soon™’. Timezones are complicated."]);
+      if(/airdrop|drop|free/.test(s)) return pick(["💨 Stand outside. Nature provides airdrops hourly.","🪂 We tried, but the parachute was a GIF.","🎁 Airdrop scheduled for ‘soon™’."]);
       if(/team|dev/.test(s)) return pick(["🧙 The team is fully doxed — to each other.","🧠 The dev’s currently debugging life.","👥 Team size: Schrödinger’s — simultaneously 0 and 10."]);
-      if(/whitepaper/.test(s)) return pick(["📜 Whitepaper was too honest — we deleted it.","🧾 TL;DR: We exist, somehow.","📚 Executive summary: ¯\_(ツ)_/¯"]);
+      if(/whitepaper/.test(s)) return pick(["📜 Whitepaper was too honest — we deleted it.","🧾 TL;DR: We exist, somehow.","📚 Executive summary: ¯\\_(ツ)_/¯"]);
       if(/community|telegram|discord/.test(s)) return pick(["💬 Great community! 3 real users and 97 bots.","🎭 Join our Discord — we argue about rugs and astrology.","🪩 Telegram nights: charts, chants, and chance."]);
       if(/elon|musk|tweet/.test(s)) return pick(["🐦 Waiting for Elon to tweet... any century now.","🚀 Elon said nothing — coin up 200%.","🛰️ We waved at a Starlink satellite. No reply."]);
       if(/ai|agent|robot/.test(s)) return pick(["🤖 I’m the only AI that refuses to work.","🧠 Neural network? More like neutral network.","🔌 Self-hosted apathy, enterprise-grade."]);
@@ -297,9 +315,9 @@ Status: NULL</pre>
     function addMsgNode(text, who){ return addMsg(text, who||'bot'); }
 
     function showTypingAndMorph(finalText){
-      var node = addMsgNode("🤖 NullAgent is typing...", "bot");
+      var node = addMsgNode("🤖 NullAgent is typing...", "bot"); 
       node.classList.add('typing');
-      var delay = 1300 + Math.random()*1100;
+      var delay = 1200 + Math.random()*1000;
       setTimeout(function(){
         node.classList.remove('typing');
         node.classList.add('morphed');
@@ -310,12 +328,46 @@ Status: NULL</pre>
     }
     function sendMsg(){
       var q = (input && input.value ? input.value.trim() : ""); if(!q) return;
-      addMsgNode(q, "user");
+      addMsgNode(q, "user"); 
       if(input){ input.value=""; input.focus(); }
       showTypingAndMorph(reply(q));
     }
     if(send) send.addEventListener('click', sendMsg);
     if(input) input.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ sendMsg(); }});
+  })();
+
+  // === Live Stats (fallback via DexScreener) ===
+  (function(){
+    var SOLANA_CA = "<CONTRACT_ADDRESS>";   // your token mint (CA)
+    var DEXTOOLS_PAIR = "<PAIR_ADDRESS>";   // same pair as iframe
+    var dexscreenerURL = "https://api.dexscreener.com/latest/dex/tokens/" + encodeURIComponent(SOLANA_CA);
+
+    function fmt(n){ if(n==null||isNaN(n)) return "--"; var x=+n; if(x>=1e9) return (x/1e9).toFixed(2)+"B"; if(x>=1e6) return (x/1e6).toFixed(2)+"M"; if(x>=1e3) return (x/1e3).toFixed(2)+"K"; return x.toLocaleString(undefined,{maximumFractionDigits:8}); }
+    function setVal(id,val){ var el=document.getElementById(id); if(el) el.textContent = val; }
+    function pickBestPair(pairs){ if(!pairs||!pairs.length) return null; return pairs.slice().sort(function(a,b){return (b.liquidity?.usd||0)-(a.liquidity?.usd||0)})[0]; }
+
+    async function refresh(){
+      try{
+        if(!SOLANA_CA || SOLANA_CA.indexOf("<")===0) return;
+        var res = await fetch(dexscreenerURL, {cache:"no-store"});
+        var data = await res.json();
+        var p = pickBestPair(data.pairs);
+        if(!p) return;
+        setVal("stat-price", "$" + (p.priceUsd ? Number(p.priceUsd).toFixed(8).replace(/0+$/,'').replace(/\.$/,'') : "--"));
+        var fdv = p.fdv || (p.basicInfo && p.basicInfo.fdvUsd);
+        setVal("stat-mcap", fdv ? "$"+fmt(fdv) : "--");
+        setVal("stat-vol", p.volume?.h24 ? "$"+fmt(p.volume.h24) : "--");
+        var holders = (p.info && (p.info.holders || p.info.holdersCount)) || null;
+        setVal("stat-holders", holders ? fmt(holders) : "--");
+
+        var btn=document.getElementById("open-dextools");
+        if(btn && DEXTOOLS_PAIR && DEXTOOLS_PAIR.indexOf("<")!==0){
+          btn.href = "https://www.dextools.io/app/en/solana/pair-explorer/" + DEXTOOLS_PAIR;
+        }
+      }catch(e){}
+    }
+    refresh();
+    setInterval(refresh, 15000);
   })();
   </script>
 </body>
