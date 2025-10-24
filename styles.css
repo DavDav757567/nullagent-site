@@ -121,3 +121,33 @@ pre{margin:0;white-space:pre-wrap;word-wrap:break-word;font-family: ui-monospace
   a.button,button{padding:8px 10px;font-size:14px}
   .stats-wrap{grid-template-columns:1fr}
 }
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: 18px;
+}
+
+.socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00ffb2, #00a76a);
+  box-shadow: 0 6px 20px rgba(35,255,107,.25);
+  transition: transform .15s ease, box-shadow .2s ease;
+}
+
+.socials a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(35,255,107,.35);
+}
+
+.socials img {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) saturate(100%) invert(7%) sepia(56%) saturate(378%) hue-rotate(95deg) brightness(92%) contrast(92%);
+}
